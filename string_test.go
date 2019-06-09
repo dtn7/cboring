@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestReadByteStringLen(t *testing.T) {
+func TestByteStringLen(t *testing.T) {
 	tests := []struct {
 		data []byte
 		len  uint64
@@ -18,16 +18,27 @@ func TestReadByteStringLen(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		// Read
 		buff := bytes.NewBuffer(test.data)
 		if n, err := ReadByteStringLen(buff); err != nil {
 			t.Fatal(err)
 		} else if n != test.len {
 			t.Fatalf("Resulting length %d is not %d", n, test.len)
 		}
+
+		// Write
+		buff.Reset()
+		if err := WriteByteStringLen(test.len, buff); err != nil {
+			t.Fatal(err)
+		}
+
+		if bb := buff.Bytes(); !reflect.DeepEqual(bb, test.data) {
+			t.Fatalf("Serialized data mismatches: %x != %x", bb, test.data)
+		}
 	}
 }
 
-func TestReadByteString(t *testing.T) {
+func TestByteString(t *testing.T) {
 	tests := []struct {
 		cbor []byte
 		data []byte
@@ -43,17 +54,27 @@ func TestReadByteString(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		// Read
 		buff := bytes.NewBuffer(test.cbor)
-
 		if data, err := ReadByteString(buff); err != nil {
 			t.Fatal(err)
 		} else if !reflect.DeepEqual(data, test.data) {
 			t.Fatalf("Deserialized data mismatches: %x != %x", data, test.data)
 		}
+
+		// Write
+		buff.Reset()
+		if err := WriteByteString(test.data, buff); err != nil {
+			t.Fatal(err)
+		}
+
+		if bb := buff.Bytes(); !reflect.DeepEqual(bb, test.cbor) {
+			t.Fatalf("Serialized data mismatches: %x != %x", bb, test.data)
+		}
 	}
 }
 
-func TestReadTextStringLen(t *testing.T) {
+func TestTextStringLen(t *testing.T) {
 	tests := []struct {
 		data []byte
 		len  uint64
@@ -65,11 +86,22 @@ func TestReadTextStringLen(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		// Read
 		buff := bytes.NewBuffer(test.data)
 		if n, err := ReadTextStringLen(buff); err != nil {
 			t.Fatal(err)
 		} else if n != test.len {
 			t.Fatalf("Resulting length %d is not %d", n, test.len)
+		}
+
+		// Write
+		buff.Reset()
+		if err := WriteTextStringLen(test.len, buff); err != nil {
+			t.Fatal(err)
+		}
+
+		if bb := buff.Bytes(); !reflect.DeepEqual(bb, test.data) {
+			t.Fatalf("Serialized data mismatches: %x != %x", bb, test.data)
 		}
 	}
 }
@@ -109,12 +141,22 @@ func TestReadTextString(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		// Read
 		buff := bytes.NewBuffer(test.cbor)
-
 		if data, err := ReadTextString(buff); err != nil {
 			t.Fatal(err)
 		} else if data != test.data {
 			t.Fatalf("Deserialized data mismatches: %s != %s", data, test.data)
+		}
+
+		// Write
+		buff.Reset()
+		if err := WriteTextString(test.data, buff); err != nil {
+			t.Fatal(err)
+		}
+
+		if bb := buff.Bytes(); !reflect.DeepEqual(bb, test.cbor) {
+			t.Fatalf("Serialized data mismatches: %x != %x", bb, test.data)
 		}
 	}
 }

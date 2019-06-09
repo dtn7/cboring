@@ -33,6 +33,27 @@ func ReadByteString(r io.Reader) (data []byte, err error) {
 	return
 }
 
+// WriteByteStringLen writes the type definition for a byte string with the
+// given length into the Writer.
+func WriteByteStringLen(n uint64, w io.Writer) error {
+	return WriteMajors(ByteString, n, w)
+}
+
+// WriteByteString writes a byte string into the Writer.
+func WriteByteString(data []byte, w io.Writer) error {
+	if err := WriteByteStringLen(uint64(len(data)), w); err != nil {
+		return err
+	}
+
+	if n, err := w.Write(data); err != nil {
+		return err
+	} else if n != len(data) {
+		return fmt.Errorf("WriteByteString: Wrote %d instead of %d bytes",
+			n, len(data))
+	}
+	return nil
+}
+
 // ReadTextStringLen expects a text string at the Reader's position and returns
 // the text string's length.
 func ReadTextStringLen(r io.Reader) (n uint64, err error) {
@@ -61,4 +82,25 @@ func ReadTextString(r io.Reader) (data string, err error) {
 
 	data = string(tmpData)
 	return
+}
+
+// WriteTextStringLen writes the type definition for a text string with the
+// given length into the Writer.
+func WriteTextStringLen(n uint64, w io.Writer) error {
+	return WriteMajors(TextString, n, w)
+}
+
+// WriteTextString writes a byte string into the Writer.
+func WriteTextString(data string, w io.Writer) error {
+	if err := WriteTextStringLen(uint64(len(data)), w); err != nil {
+		return err
+	}
+
+	if n, err := w.Write([]byte(data)); err != nil {
+		return err
+	} else if n != len(data) {
+		return fmt.Errorf("WriteTextString: Wrote %d instead of %d bytes",
+			n, len(data))
+	}
+	return nil
 }
