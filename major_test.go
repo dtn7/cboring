@@ -6,13 +6,13 @@ import (
 	"testing"
 )
 
-func TestReadMajorFieldsSmall(t *testing.T) {
+func TestReadMajorsSmall(t *testing.T) {
 	tests := []MajorType{UInt, NegInt, ByteString, TextString, Array}
 
 	for _, test := range tests {
 		for i := uint64(0); i <= 23; i++ {
 			r := bytes.NewBuffer([]byte{(test << 5) | byte(i)})
-			if m, n, err := ReadMajorFields(r); err != nil {
+			if m, n, err := ReadMajors(r); err != nil {
 				t.Fatal(err)
 			} else if m != test {
 				t.Fatalf("Resulting type %d mismatches %d", m, test)
@@ -23,7 +23,7 @@ func TestReadMajorFieldsSmall(t *testing.T) {
 	}
 }
 
-func TestReadMajorFieldsBig(t *testing.T) {
+func TestReadMajorsBig(t *testing.T) {
 	tests := []struct {
 		data  []byte
 		major MajorType
@@ -38,7 +38,7 @@ func TestReadMajorFieldsBig(t *testing.T) {
 
 	for _, test := range tests {
 		r := bytes.NewBuffer(test.data)
-		if m, n, err := ReadMajorFields(r); err != nil {
+		if m, n, err := ReadMajors(r); err != nil {
 			t.Fatal(err)
 		} else if m != test.major {
 			t.Fatalf("Resulting type %d mismatches %d", m, test.major)
@@ -48,7 +48,7 @@ func TestReadMajorFieldsBig(t *testing.T) {
 	}
 }
 
-func TestReadMajorFieldsError(t *testing.T) {
+func TestReadMajorsError(t *testing.T) {
 	tests := [][]byte{
 		// Empty stream
 		[]byte{},
@@ -58,24 +58,24 @@ func TestReadMajorFieldsError(t *testing.T) {
 
 	for _, test := range tests {
 		r := bytes.NewBuffer(test)
-		if _, _, err := ReadMajorFields(r); err == nil {
+		if _, _, err := ReadMajors(r); err == nil {
 			t.Fatalf("Illegal input %x did not errored", test)
 		}
 	}
 }
 
-func TestWriteMajorFieldsSmall(t *testing.T) {
+func TestWriteMajorsSmall(t *testing.T) {
 	tests := []MajorType{UInt, NegInt, ByteString, TextString, Array}
 
 	for _, test := range tests {
 		for i := uint64(0); i <= 23; i++ {
 			var buff bytes.Buffer
 
-			if err := WriteMajorFields(test, i, &buff); err != nil {
+			if err := WriteMajors(test, i, &buff); err != nil {
 				t.Fatal(err)
 			}
 
-			if m, n, err := ReadMajorFields(&buff); err != nil {
+			if m, n, err := ReadMajors(&buff); err != nil {
 				t.Fatal(err)
 			} else if m != test {
 				t.Fatalf("Resulting type %d mismatches %d", m, test)
@@ -86,7 +86,7 @@ func TestWriteMajorFieldsSmall(t *testing.T) {
 	}
 }
 
-func TestWriteMajorFieldsBig(t *testing.T) {
+func TestWriteMajorsBig(t *testing.T) {
 	tests := []struct {
 		data  []byte
 		major MajorType
@@ -102,7 +102,7 @@ func TestWriteMajorFieldsBig(t *testing.T) {
 	for _, test := range tests {
 		var buff bytes.Buffer
 
-		if err := WriteMajorFields(test.major, test.numb, &buff); err != nil {
+		if err := WriteMajors(test.major, test.numb, &buff); err != nil {
 			t.Fatal(err)
 		}
 
