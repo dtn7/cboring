@@ -2,10 +2,11 @@ package cboring
 
 import (
 	"bytes"
+	"reflect"
 	"testing"
 )
 
-func TestReadUInt(t *testing.T) {
+func TestUInt(t *testing.T) {
 	tests := []struct {
 		data []byte
 		numb uint64
@@ -24,16 +25,27 @@ func TestReadUInt(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		r := bytes.NewBuffer(test.data)
-		if n, err := ReadUInt(r); err != nil {
+		// Read
+		buff := bytes.NewBuffer(test.data)
+		if n, err := ReadUInt(buff); err != nil {
 			t.Fatal(err)
 		} else if n != test.numb {
 			t.Fatalf("Resulting uint %d is not %d", n, test.numb)
 		}
+
+		// Write
+		buff.Reset()
+		if err := WriteUInt(test.numb, buff); err != nil {
+			t.Fatal(err)
+		}
+
+		if bb := buff.Bytes(); !reflect.DeepEqual(bb, test.data) {
+			t.Fatalf("Serialized data mismatches: %x != %x", bb, test.data)
+		}
 	}
 }
 
-func TestReadNegInt(t *testing.T) {
+func TestNegInt(t *testing.T) {
 	tests := []struct {
 		data []byte
 		numb int64
@@ -45,11 +57,22 @@ func TestReadNegInt(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		r := bytes.NewBuffer(test.data)
-		if n, err := ReadNegInt(r); err != nil {
+		// Read
+		buff := bytes.NewBuffer(test.data)
+		if n, err := ReadNegInt(buff); err != nil {
 			t.Fatal(err)
 		} else if n != test.numb {
 			t.Fatalf("Resulting int %d is not %d", n, test.numb)
+		}
+
+		// Write
+		buff.Reset()
+		if err := WriteNegInt(test.numb, buff); err != nil {
+			t.Fatal(err)
+		}
+
+		if bb := buff.Bytes(); !reflect.DeepEqual(bb, test.data) {
+			t.Fatalf("Serialized data mismatches: %x != %x", bb, test.data)
 		}
 	}
 }
