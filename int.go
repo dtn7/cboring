@@ -6,7 +6,7 @@ import (
 )
 
 func ReadUInt(r io.Reader) (n uint64, err error) {
-	m, n, err := ParseMajorFields(r)
+	m, n, err := ReadMajorFields(r)
 	if err == nil && m != UInt {
 		err = fmt.Errorf("ReadUInt: Wrong Major Type: %d instead of %d", m, UInt)
 	}
@@ -14,7 +14,7 @@ func ReadUInt(r io.Reader) (n uint64, err error) {
 }
 
 func ReadNegInt(r io.Reader) (n int64, err error) {
-	m, tmp, err := ParseMajorFields(r)
+	m, tmp, err := ReadMajorFields(r)
 	if err == nil && m != NegInt {
 		err = fmt.Errorf("ReadNegInt: Wrong Major Type: %d instead of %d", m, NegInt)
 	}
