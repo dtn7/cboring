@@ -5,22 +5,15 @@ import (
 	"testing"
 )
 
-func TestReadUintSmall(t *testing.T) {
-	for i := uint64(0); i <= 23; i++ {
-		r := bytes.NewBuffer([]byte{byte(i)})
-		if n, err := ReadUint(r); err != nil {
-			t.Fatal(err)
-		} else if n != i {
-			t.Fatalf("Resulting uint %d is not %d", n, i)
-		}
-	}
-}
-
-func TestReadUintBig(t *testing.T) {
+func TestReadUInt(t *testing.T) {
 	tests := []struct {
 		data []byte
 		numb uint64
 	}{
+		{[]byte{0x00}, 0},
+		{[]byte{0x01}, 1},
+		{[]byte{0x0a}, 10},
+		{[]byte{0x17}, 23},
 		{[]byte{0x18, 0x18}, 24},
 		{[]byte{0x18, 0x19}, 25},
 		{[]byte{0x18, 0x64}, 100},
@@ -32,7 +25,7 @@ func TestReadUintBig(t *testing.T) {
 
 	for _, test := range tests {
 		r := bytes.NewBuffer(test.data)
-		if n, err := ReadUint(r); err != nil {
+		if n, err := ReadUInt(r); err != nil {
 			t.Fatal(err)
 		} else if n != test.numb {
 			t.Fatalf("Resulting uint %d is not %d", n, test.numb)
@@ -40,27 +33,28 @@ func TestReadUintBig(t *testing.T) {
 	}
 }
 
-func TestReadUintMultiple(t *testing.T) {
-	numbs := []uint64{0, 1000, 24, 25, 1000000000000}
-	data := []byte{
-		0x00,
-		0x19, 0x03, 0xe8,
-		0x18, 0x18,
-		0x18, 0x19,
-		0x1b, 0x00, 0x00, 0x00, 0xe8, 0xd4, 0xa5, 0x10, 0x00,
+func TestReadNegInt(t *testing.T) {
+	tests := []struct {
+		data []byte
+		numb int64
+	}{
+		{[]byte{0x20}, -1},
+		{[]byte{0x29}, -10},
+		{[]byte{0x38, 0x63}, -100},
+		{[]byte{0x39, 0x03, 0xe7}, -1000},
 	}
 
-	r := bytes.NewBuffer(data)
-	for _, numb := range numbs {
-		if n, err := ReadUint(r); err != nil {
+	for _, test := range tests {
+		r := bytes.NewBuffer(test.data)
+		if n, err := ReadNegInt(r); err != nil {
 			t.Fatal(err)
-		} else if n != numb {
-			t.Fatalf("Resulting uint %d is not %d", n, numb)
+		} else if n != test.numb {
+			t.Fatalf("Resulting int %d is not %d", n, test.numb)
 		}
 	}
 }
 
-func TestReadUintError(t *testing.T) {
+func TestReadUIntError(t *testing.T) {
 	tests := [][]byte{
 		// Wrong major type
 		[]byte{0xFF},
@@ -69,14 +63,32 @@ func TestReadUintError(t *testing.T) {
 		// Empty stream
 		[]byte{},
 		// Incomplete streams
-		[]byte{0x18},
-		[]byte{0x19, 0x03},
-		[]byte{0x1b, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+		[]byte{0x18}, []byte{0x1b, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 	}
 
 	for _, test := range tests {
 		r := bytes.NewBuffer(test)
-		if _, err := ReadUint(r); err == nil {
+		if _, err := ReadUInt(r); err == nil {
+			t.Fatalf("Illegal input %x did not errored", test)
+		}
+	}
+}
+
+func TestReadNegIntError(t *testing.T) {
+	tests := [][]byte{
+		// Wrong major type
+		[]byte{0xFF},
+		// Wrong additionals for major type 0
+		[]byte{0x3F},
+		// Empty stream
+		[]byte{},
+		// Incomplete streams
+		[]byte{0x38}, []byte{0x39, 0x03},
+	}
+
+	for _, test := range tests {
+		r := bytes.NewBuffer(test)
+		if _, err := ReadNegInt(r); err == nil {
 			t.Fatalf("Illegal input %x did not errored", test)
 		}
 	}

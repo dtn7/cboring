@@ -5,10 +5,19 @@ import (
 	"io"
 )
 
-func ReadUint(r io.Reader) (n uint64, err error) {
+func ReadUInt(r io.Reader) (n uint64, err error) {
 	m, n, err := ParseMajorFields(r)
 	if err == nil && m != UInt {
-		err = fmt.Errorf("ReadUint: Wrong Major Type: %d instead of %d", m, UInt)
+		err = fmt.Errorf("ReadUInt: Wrong Major Type: %d instead of %d", m, UInt)
 	}
+	return
+}
+
+func ReadNegInt(r io.Reader) (n int64, err error) {
+	m, tmp, err := ParseMajorFields(r)
+	if err == nil && m != NegInt {
+		err = fmt.Errorf("ReadNegInt: Wrong Major Type: %d instead of %d", m, NegInt)
+	}
+	n = -1 - int64(tmp)
 	return
 }
