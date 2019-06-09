@@ -11,7 +11,7 @@ func TestReadUintSmall(t *testing.T) {
 		if n, err := ReadUint(r); err != nil {
 			t.Fatal(err)
 		} else if n != i {
-			t.Fatalf("Resulted uint %d is not %d", n, i)
+			t.Fatalf("Resulting uint %d is not %d", n, i)
 		}
 	}
 }
@@ -35,7 +35,7 @@ func TestReadUintBig(t *testing.T) {
 		if n, err := ReadUint(r); err != nil {
 			t.Fatal(err)
 		} else if n != test.numb {
-			t.Fatalf("Resulted uint %d is not %d", n, test.numb)
+			t.Fatalf("Resulting uint %d is not %d", n, test.numb)
 		}
 	}
 }
@@ -55,7 +55,7 @@ func TestReadUintMultiple(t *testing.T) {
 		if n, err := ReadUint(r); err != nil {
 			t.Fatal(err)
 		} else if n != numb {
-			t.Fatalf("Resulted uint %d is not %d", n, numb)
+			t.Fatalf("Resulting uint %d is not %d", n, numb)
 		}
 	}
 }
@@ -77,7 +77,7 @@ func TestReadUintError(t *testing.T) {
 	for _, test := range tests {
 		r := bytes.NewBuffer(test)
 		if _, err := ReadUint(r); err == nil {
-			t.Fatalf("Wrong type %x did not errored", test)
+			t.Fatalf("Illegal input %x did not errored", test)
 		}
 	}
 }
