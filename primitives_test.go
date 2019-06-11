@@ -111,6 +111,8 @@ func TestReadNegIntError(t *testing.T) {
 		[]byte{},
 		// Incomplete streams
 		[]byte{0x38}, []byte{0x39, 0x03},
+		// Too small number (int64 only allows half of uint64)
+		[]byte{0x3B, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
 	}
 
 	for _, test := range tests {

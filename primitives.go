@@ -3,6 +3,7 @@ package cboring
 import (
 	"fmt"
 	"io"
+	"math"
 )
 
 /*** Uint ***/
@@ -23,7 +24,11 @@ func WriteUInt(n uint64, w io.Writer) error {
 func ReadNegInt(r io.Reader) (n int64, err error) {
 	un, err := ReadExpectMajors(NegInt, r)
 	if err == nil {
-		n = -1 - int64(un)
+		if un > math.MaxInt64 {
+			err = fmt.Errorf("ReadNegInt: Received number is too small for int64")
+		} else {
+			n = -1 - int64(un)
+		}
 	}
 	return
 }
