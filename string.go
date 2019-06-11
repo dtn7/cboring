@@ -5,6 +5,16 @@ import (
 	"io"
 )
 
+func readString(len int, r io.Reader) (data []byte, err error) {
+	data = make([]byte, len)
+	if rn, rerr := r.Read(data); err != nil {
+		err = rerr
+	} else if rn != len {
+		err = fmt.Errorf("readString: read length mismatches: %d != %d", rn, len)
+	}
+	return
+}
+
 // ReadByteStringLen expects a byte string at the Reader's position and returns
 // the byte string.
 func ReadByteString(r io.Reader) (data []byte, err error) {
@@ -13,13 +23,7 @@ func ReadByteString(r io.Reader) (data []byte, err error) {
 		return
 	}
 
-	data = make([]byte, n)
-	if rn, rerr := r.Read(data); err != nil {
-		err = rerr
-	} else if rn != int(n) {
-		err = fmt.Errorf("ReadByteString: read length mismatches: %d != %d", rn, n)
-	}
-	return
+	return readString(int(n), r)
 }
 
 // WriteByteString writes a byte string into the Writer.
@@ -45,14 +49,11 @@ func ReadTextString(r io.Reader) (data string, err error) {
 		return
 	}
 
-	tmpData := make([]byte, n)
-	if rn, rerr := r.Read(tmpData); err != nil {
+	if rdata, rerr := readString(int(n), r); rerr != nil {
 		err = rerr
-	} else if rn != int(n) {
-		err = fmt.Errorf("ReadTextString: read length mismatches: %d != %d", rn, n)
+	} else {
+		data = string(rdata)
 	}
-
-	data = string(tmpData)
 	return
 }
 
@@ -62,7 +63,8 @@ func WriteTextString(data string, w io.Writer) error {
 		return err
 	}
 
-	if n, err := w.Write([]byte(data)); err != nil {
+	// WriteString instead of w.Write to save a cast
+	if n, err := io.WriteString(w, data); err != nil {
 		return err
 	} else if n != len(data) {
 		return fmt.Errorf("WriteTextString: Wrote %d instead of %d bytes",
