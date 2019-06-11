@@ -14,20 +14,22 @@ const (
 	ByteString MajorType = 0x40
 	TextString MajorType = 0x60
 	Array      MajorType = 0x80
-	Map        MajorType = 0xA0
-	Tagging    MajorType = 0xC0
-	Etc        MajorType = 0xE0
 )
 
-type flag string
+const (
+	IndefiniteArray byte = 0x9F
+	BreakCode       byte = 0xFF
+)
+
+type flag byte
 
 func (f flag) Error() string {
 	return string(f)
 }
 
 const (
-	IndefiniteLength = flag("Indefinite Length Array")
-	BreakCode        = flag("Break Stop Code")
+	flagIndefiniteArray = flag(iota)
+	flagBreakCode       = flag(iota)
 )
 
 func readMajorType(b byte) (major MajorType, adds byte) {
@@ -46,30 +48,37 @@ func ReadMajors(r io.Reader) (m MajorType, n uint64, err error) {
 		return
 	}
 
-	m, adds := readMajorType(tmpBuff[0])
-	if adds <= 23 {
-		n = uint64(adds)
-	} else if 24 <= adds && adds <= 27 {
-		l := 1 << (adds - 24)
-		tmpBuff = buff[:l]
+	switch b := tmpBuff[0]; b {
+	case IndefiniteArray:
+		err = flagIndefiniteArray
 
-		if rn, rerr := r.Read(tmpBuff); rerr != nil {
-			err = rerr
-			return
-		} else if rn != l {
-			err = fmt.Errorf("ReadMajors: Read %d bytes instead of %d", rn, l)
-			return
-		}
+	case BreakCode:
+		err = flagBreakCode
 
-		for i := 0; i < l; i++ {
-			n = n<<8 | uint64(tmpBuff[i])
+	default:
+		var adds byte
+		m, adds = readMajorType(b)
+
+		if adds <= 23 {
+			n = uint64(adds)
+		} else if 24 <= adds && adds <= 27 {
+			l := 1 << (adds - 24)
+			tmpBuff = buff[:l]
+
+			if rn, rerr := r.Read(tmpBuff); rerr != nil {
+				err = rerr
+				return
+			} else if rn != l {
+				err = fmt.Errorf("ReadMajors: Read %d bytes instead of %d", rn, l)
+				return
+			}
+
+			for i := 0; i < l; i++ {
+				n = n<<8 | uint64(tmpBuff[i])
+			}
+		} else {
+			err = fmt.Errorf("ReadMajors: Other additional information %d", adds)
 		}
-	} else if adds == 31 && m == Array {
-		err = IndefiniteLength
-	} else if adds == 31 && m == Etc {
-		err = BreakCode
-	} else {
-		err = fmt.Errorf("ReadMajors: Other additional information %d", adds)
 	}
 
 	return
