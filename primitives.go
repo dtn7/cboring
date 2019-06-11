@@ -71,6 +71,7 @@ func WriteTextStringLen(n uint64, w io.Writer) error {
 }
 
 /*** Array ***/
+
 // ReadArrayLength expects an array at the Reader's position and returns its
 // length.
 func ReadArrayLength(r io.Reader) (n uint64, err error) {

@@ -77,7 +77,7 @@ func ReadMajors(r io.Reader) (m MajorType, n uint64, err error) {
 				n = n<<8 | uint64(tmpBuff[i])
 			}
 		} else {
-			err = fmt.Errorf("ReadMajors: Other additional information %d", adds)
+			err = fmt.Errorf("ReadMajors: Other additional information 0x%x", adds)
 		}
 	}
 
@@ -93,6 +93,22 @@ func ReadExpectMajors(m MajorType, r io.Reader) (n uint64, err error) {
 			m, mTmp)
 	}
 	return
+}
+
+// ReadExpect reads one byte from the Reader and errors if it does not contain
+// the expected value. This might be useful to check if an indefinite-length
+// array begins or ends with an break stop code.
+func ReadExpect(b byte, r io.Reader) error {
+	var buff [1]byte
+
+	if _, err := r.Read(buff[:1]); err != nil {
+		return err
+	}
+
+	if data := buff[0]; data != b {
+		return fmt.Errorf("ReadExpect: Expected 0x%x, got 0x%x", b, data)
+	}
+	return nil
 }
 
 func writeMajorType(major MajorType, adds byte) byte {

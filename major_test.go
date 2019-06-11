@@ -111,3 +111,57 @@ func TestWriteMajorsBig(t *testing.T) {
 		}
 	}
 }
+
+func TestReadExpect(t *testing.T) {
+	var buff bytes.Buffer
+	for i := byte(0); i < 255; i++ {
+		// Read correct input
+		buff.Reset()
+		buff.WriteByte(i)
+
+		if err := ReadExpect(i, &buff); err != nil {
+			t.Fatalf("ReadExpect errored for %d: %v", i, err)
+		}
+
+		// Read invalid input
+		buff.Reset()
+		buff.WriteByte(i + 1)
+
+		if err := ReadExpect(i, &buff); err == nil {
+			t.Fatalf("ReadExpect did not errored for %d", i)
+		}
+	}
+}
+
+func TestReadExampleArray(t *testing.T) {
+	var data = []byte{
+		0x9f, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
+		0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+		0x18, 0x18, 0x18, 0x19, 0xff}
+
+	var buff = bytes.NewBuffer(data)
+
+	// Should start with an indefinite length array
+	if err := ReadExpect(IndefiniteArray, buff); err != nil {
+		t.Fatalf("Data does not start with an indefinite length array: %v", err)
+	}
+
+	// Read numbers until break stop code (should be 1..25)
+	for c := uint64(1); ; c++ {
+		n, err := ReadUInt(buff)
+
+		if err != nil && err != flagBreakCode {
+			t.Fatal(flagBreakCode)
+		} else if err == flagBreakCode {
+			if c != 26 {
+				t.Fatalf("Break stop code appeared at %d, not at %d", c, 26)
+			}
+
+			break
+		} else if c > 25 {
+			t.Fatalf("Reached %d, which is greater than %d", c, 25)
+		} else if c != n {
+			t.Fatalf("Read %d, not %d", n, c)
+		}
+	}
+}
