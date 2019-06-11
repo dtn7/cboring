@@ -6,38 +6,6 @@ import (
 	"testing"
 )
 
-func TestByteStringLen(t *testing.T) {
-	tests := []struct {
-		data []byte
-		len  uint64
-	}{
-		{[]byte{0x40}, 0},
-		{[]byte{0x44}, 4},
-		{[]byte{0x58, 0x37}, 55},
-		{[]byte{0x59, 0x0A, 0x50}, 2640},
-	}
-
-	for _, test := range tests {
-		// Read
-		buff := bytes.NewBuffer(test.data)
-		if n, err := ReadByteStringLen(buff); err != nil {
-			t.Fatal(err)
-		} else if n != test.len {
-			t.Fatalf("Resulting length %d is not %d", n, test.len)
-		}
-
-		// Write
-		buff.Reset()
-		if err := WriteByteStringLen(test.len, buff); err != nil {
-			t.Fatal(err)
-		}
-
-		if bb := buff.Bytes(); !reflect.DeepEqual(bb, test.data) {
-			t.Fatalf("Serialized data mismatches: %x != %x", bb, test.data)
-		}
-	}
-}
-
 func TestByteString(t *testing.T) {
 	tests := []struct {
 		cbor []byte
@@ -69,38 +37,6 @@ func TestByteString(t *testing.T) {
 		}
 
 		if bb := buff.Bytes(); !reflect.DeepEqual(bb, test.cbor) {
-			t.Fatalf("Serialized data mismatches: %x != %x", bb, test.data)
-		}
-	}
-}
-
-func TestTextStringLen(t *testing.T) {
-	tests := []struct {
-		data []byte
-		len  uint64
-	}{
-		{[]byte{0x60}, 0},
-		{[]byte{0x61}, 1},
-		{[]byte{0x78, 0x1A}, 26},
-		{[]byte{0x79, 0x07, 0xD0}, 2000},
-	}
-
-	for _, test := range tests {
-		// Read
-		buff := bytes.NewBuffer(test.data)
-		if n, err := ReadTextStringLen(buff); err != nil {
-			t.Fatal(err)
-		} else if n != test.len {
-			t.Fatalf("Resulting length %d is not %d", n, test.len)
-		}
-
-		// Write
-		buff.Reset()
-		if err := WriteTextStringLen(test.len, buff); err != nil {
-			t.Fatal(err)
-		}
-
-		if bb := buff.Bytes(); !reflect.DeepEqual(bb, test.data) {
 			t.Fatalf("Serialized data mismatches: %x != %x", bb, test.data)
 		}
 	}

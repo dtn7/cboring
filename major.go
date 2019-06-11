@@ -75,6 +75,17 @@ func ReadMajors(r io.Reader) (m MajorType, n uint64, err error) {
 	return
 }
 
+// ReadExpectMajors parses the next (major) type, which must equal the requested
+// one. This function wraps ReadMajors.
+func ReadExpectMajors(m MajorType, r io.Reader) (n uint64, err error) {
+	mTmp, n, err := ReadMajors(r)
+	if err == nil && m != mTmp {
+		err = fmt.Errorf("ReadExpectMajors: Wrong Major Type: 0x%x instead of 0x%x",
+			m, mTmp)
+	}
+	return
+}
+
 func writeMajorType(major MajorType, adds byte) byte {
 	return major | adds
 }
@@ -87,7 +98,7 @@ func WriteMajors(m MajorType, n uint64, w io.Writer) (err error) {
 	if n < 24 {
 		buff[0] = writeMajorType(m, byte(n))
 	} else {
-		var mt uint8
+		var mt byte
 		if n < 1<<8 {
 			bc = 1
 			mt = 24
