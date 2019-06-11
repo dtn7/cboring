@@ -19,6 +19,17 @@ const (
 	Etc        MajorType = 7
 )
 
+type flag string
+
+func (f flag) Error() string {
+	return string(f)
+}
+
+const (
+	IndefiniteLength = flag("Indefinite Length Array")
+	BreakCode        = flag("Break Stop Code")
+)
+
 func readMajorType(b byte) (major MajorType, adds byte) {
 	major = b >> 5
 	adds = b & 0x1F
@@ -53,6 +64,10 @@ func ReadMajors(r io.Reader) (m MajorType, n uint64, err error) {
 		for i := 0; i < l; i++ {
 			n = n<<8 | uint64(tmpBuff[i])
 		}
+	} else if adds == 31 && m == Array {
+		err = IndefiniteLength
+	} else if adds == 31 && m == Etc {
+		err = BreakCode
 	} else {
 		err = fmt.Errorf("ReadMajors: Other additional information %d", adds)
 	}
