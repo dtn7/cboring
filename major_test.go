@@ -11,7 +11,7 @@ func TestReadMajorsSmall(t *testing.T) {
 
 	for _, test := range tests {
 		for i := uint64(0); i <= 23; i++ {
-			r := bytes.NewBuffer([]byte{(test << 5) | byte(i)})
+			r := bytes.NewBuffer([]byte{test | byte(i)})
 			if m, n, err := ReadMajors(r); err != nil {
 				t.Fatal(err)
 			} else if m != test {

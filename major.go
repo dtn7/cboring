@@ -9,14 +9,14 @@ import (
 type MajorType = byte
 
 const (
-	UInt       MajorType = 0
-	NegInt     MajorType = 1
-	ByteString MajorType = 2
-	TextString MajorType = 3
-	Array      MajorType = 4
-	Map        MajorType = 5
-	Tagging    MajorType = 6
-	Etc        MajorType = 7
+	UInt       MajorType = 0x00
+	NegInt     MajorType = 0x20
+	ByteString MajorType = 0x40
+	TextString MajorType = 0x60
+	Array      MajorType = 0x80
+	Map        MajorType = 0xA0
+	Tagging    MajorType = 0xC0
+	Etc        MajorType = 0xE0
 )
 
 type flag string
@@ -31,7 +31,7 @@ const (
 )
 
 func readMajorType(b byte) (major MajorType, adds byte) {
-	major = b >> 5
+	major = b & 0xE0
 	adds = b & 0x1F
 	return
 }
@@ -76,7 +76,7 @@ func ReadMajors(r io.Reader) (m MajorType, n uint64, err error) {
 }
 
 func writeMajorType(major MajorType, adds byte) byte {
-	return (major << 5) | (adds & 0x1F)
+	return major | adds
 }
 
 // WriteMajors composes a (major) type definition into the Writer.
