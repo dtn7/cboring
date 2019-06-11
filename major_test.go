@@ -7,7 +7,7 @@ import (
 )
 
 func TestReadMajorsSmall(t *testing.T) {
-	tests := []MajorType{UInt, NegInt, ByteString, TextString, Array}
+	tests := []MajorType{UInt, ByteString, TextString, Array}
 
 	for _, test := range tests {
 		for i := uint64(0); i <= 23; i++ {
@@ -30,7 +30,6 @@ func TestReadMajorsBig(t *testing.T) {
 		numb  uint64
 	}{
 		{[]byte{0x18, 0x64}, UInt, 100},
-		{[]byte{0x38, 0x63}, NegInt, 99}, // 99 = abs(-1 - 100)
 		{[]byte{0x58, 0x40}, ByteString, 64},
 		{[]byte{0x78, 0x20}, TextString, 32},
 		{[]byte{0x98, 0x19}, Array, 25},
@@ -65,7 +64,7 @@ func TestReadMajorsError(t *testing.T) {
 }
 
 func TestWriteMajorsSmall(t *testing.T) {
-	tests := []MajorType{UInt, NegInt, ByteString, TextString, Array}
+	tests := []MajorType{UInt, ByteString, TextString, Array}
 
 	for _, test := range tests {
 		for i := uint64(0); i <= 23; i++ {
@@ -93,7 +92,6 @@ func TestWriteMajorsBig(t *testing.T) {
 		numb  uint64
 	}{
 		{[]byte{0x18, 0x64}, UInt, 100},
-		{[]byte{0x38, 0x63}, NegInt, 99}, // 99 = abs(-1 - 100)
 		{[]byte{0x58, 0x40}, ByteString, 64},
 		{[]byte{0x78, 0x20}, TextString, 32},
 		{[]byte{0x98, 0x19}, Array, 25},

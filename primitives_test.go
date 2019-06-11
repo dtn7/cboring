@@ -67,62 +67,6 @@ func TestReadUIntError(t *testing.T) {
 	}
 }
 
-/*** NegInt ***/
-
-func TestNegInt(t *testing.T) {
-	tests := []struct {
-		data []byte
-		numb int64
-	}{
-		{[]byte{0x20}, -1},
-		{[]byte{0x29}, -10},
-		{[]byte{0x38, 0x63}, -100},
-		{[]byte{0x39, 0x03, 0xe7}, -1000},
-	}
-
-	for _, test := range tests {
-		// Read
-		buff := bytes.NewBuffer(test.data)
-		if n, err := ReadNegInt(buff); err != nil {
-			t.Fatal(err)
-		} else if n != test.numb {
-			t.Fatalf("Resulting int %d is not %d", n, test.numb)
-		}
-
-		// Write
-		buff.Reset()
-		if err := WriteNegInt(test.numb, buff); err != nil {
-			t.Fatal(err)
-		}
-
-		if bb := buff.Bytes(); !reflect.DeepEqual(bb, test.data) {
-			t.Fatalf("Serialized data mismatches: %x != %x", bb, test.data)
-		}
-	}
-}
-
-func TestReadNegIntError(t *testing.T) {
-	tests := [][]byte{
-		// Wrong major type
-		[]byte{0xFF},
-		// Wrong additionals for major type 0
-		[]byte{0x3F},
-		// Empty stream
-		[]byte{},
-		// Incomplete streams
-		[]byte{0x38}, []byte{0x39, 0x03},
-		// Too small number (int64 only allows half of uint64)
-		[]byte{0x3B, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
-	}
-
-	for _, test := range tests {
-		r := bytes.NewBuffer(test)
-		if _, err := ReadNegInt(r); err == nil {
-			t.Fatalf("Illegal input %x did not errored", test)
-		}
-	}
-}
-
 /*** ByteString ***/
 
 func TestByteStringLen(t *testing.T) {

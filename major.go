@@ -10,7 +10,6 @@ type MajorType = byte
 
 const (
 	UInt       MajorType = 0x00
-	NegInt     MajorType = 0x20
 	ByteString MajorType = 0x40
 	TextString MajorType = 0x60
 	Array      MajorType = 0x80

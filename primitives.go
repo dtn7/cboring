@@ -1,10 +1,6 @@
 package cboring
 
-import (
-	"fmt"
-	"io"
-	"math"
-)
+import "io"
 
 /*** Uint ***/
 
@@ -16,30 +12,6 @@ func ReadUInt(r io.Reader) (n uint64, err error) {
 // WriteUInt serializes an unsigned integer into the Writer.
 func WriteUInt(n uint64, w io.Writer) error {
 	return WriteMajors(UInt, n, w)
-}
-
-/*** NegInt ***/
-
-// ReadNegInt expects a negative integer at the Reader's position and returns it.
-func ReadNegInt(r io.Reader) (n int64, err error) {
-	un, err := ReadExpectMajors(NegInt, r)
-	if err == nil {
-		if un > math.MaxInt64 {
-			err = fmt.Errorf("ReadNegInt: Received number is too small for int64")
-		} else {
-			n = -1 - int64(un)
-		}
-	}
-	return
-}
-
-// WriteNegInt serializes a negative integer into the Writer.
-func WriteNegInt(n int64, w io.Writer) error {
-	if n >= 0 {
-		return fmt.Errorf("WriteNegInt: Expected negative integer")
-	}
-
-	return WriteMajors(NegInt, uint64((n+1)*(-1)), w)
 }
 
 /*** ByteString ***/
