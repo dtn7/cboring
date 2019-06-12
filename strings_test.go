@@ -2,6 +2,8 @@ package cboring
 
 import (
 	"bytes"
+	"fmt"
+	"math/rand"
 	"reflect"
 	"testing"
 )
@@ -39,6 +41,57 @@ func TestByteString(t *testing.T) {
 		if bb := buff.Bytes(); !reflect.DeepEqual(bb, test.cbor) {
 			t.Fatalf("Serialized data mismatches: %x != %x", bb, test.data)
 		}
+	}
+}
+
+func BenchmarkByteString(b *testing.B) {
+	sizes := []int{
+		// Ridiculously small
+		0, 1, 128, 256,
+		// Kibibytes
+		1024, 10240, 102400,
+		// Mebibytes
+		1048576, 10485760, 104857600,
+	}
+
+	for _, size := range sizes {
+		rndData := make([]byte, size)
+		rand.Seed(0)
+		rand.Read(rndData)
+
+		b.Run(fmt.Sprintf("r%d", size), func(b *testing.B) {
+			// The benchmark will be executed in parallel. Therefore each thread
+			// needs its own buffer.
+			buff := new(bytes.Buffer)
+			WriteByteStringLen(uint64(size), buff)
+			buff.Write(rndData)
+
+			// Don't measure setup time
+			b.ResetTimer()
+
+			data, err := ReadByteString(buff)
+			if err != nil {
+				b.Fatal(err)
+			} else if len(data) != size {
+				b.Fatalf("Read wrong length %d != %d", len(data), size)
+			}
+		})
+
+		b.Run(fmt.Sprintf("w%d", size), func(b *testing.B) {
+			buff := new(bytes.Buffer)
+			if err := WriteByteString(rndData, buff); err != nil {
+				b.Fatal(err)
+			}
+
+			// Buff should contain size + CBOR's overhead amount of bytes.
+			ls := []int{size + 1, size + 2, size + 3, size + 5, size + 9}
+			for _, l := range ls {
+				if l == buff.Len() {
+					return
+				}
+			}
+			b.Fatalf("Wrote wrong length %d", buff.Len())
+		})
 	}
 }
 
