@@ -1,7 +1,9 @@
 package cboring
 
 import (
+	"bufio"
 	"bytes"
+	"math/rand"
 	"reflect"
 	"testing"
 )
@@ -160,6 +162,39 @@ func TestReadExampleArray(t *testing.T) {
 			t.Fatalf("Reached %d, which is greater than %d", c, 25)
 		} else if c != n {
 			t.Fatalf("Read %d, not %d", n, c)
+		}
+	}
+}
+
+func TestReadBigData(t *testing.T) {
+	var size = 1024
+	var payload = make([]byte, size)
+	rand.Seed(0)
+	rand.Read(payload)
+
+	var elems = []int{100, 500, 1000, 5000, 10000, 50000}
+	for _, elem := range elems {
+		buff := new(bytes.Buffer)
+		bw := bufio.NewWriter(buff)
+
+		for i := 0; i < elem; i++ {
+			if err := WriteByteString(payload, bw); err != nil {
+				t.Fatalf("Writing no %d errored: %v", i, err)
+			}
+		}
+
+		if err := bw.Flush(); err != nil {
+			t.Fatalf("Flushing errored: %v", err)
+		}
+
+		br := bufio.NewReader(buff)
+		for i := 0; i < elem; i++ {
+			tmp, err := ReadByteString(br)
+			if err != nil {
+				t.Fatalf("Reading no %d errored: %v", i, err)
+			} else if len(tmp) != size {
+				t.Fatalf("Length no %d mismatches: %d != %d", i, len(tmp), size)
+			}
 		}
 	}
 }

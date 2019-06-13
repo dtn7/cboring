@@ -7,7 +7,7 @@ import (
 
 func readString(len int, r io.Reader) (data []byte, err error) {
 	data = make([]byte, len)
-	if rn, rerr := r.Read(data); err != nil {
+	if rn, rerr := io.ReadFull(r, data); err != nil {
 		err = rerr
 	} else if rn != len {
 		err = fmt.Errorf("readString: read length mismatches: %d != %d", rn, len)

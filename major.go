@@ -42,7 +42,7 @@ func ReadMajors(r io.Reader) (m MajorType, n uint64, err error) {
 	var buff [8]byte
 	tmpBuff := buff[:1]
 
-	if _, rerr := r.Read(tmpBuff); rerr != nil {
+	if _, rerr := io.ReadFull(r, tmpBuff); rerr != nil {
 		err = rerr
 		return
 	}
@@ -64,7 +64,7 @@ func ReadMajors(r io.Reader) (m MajorType, n uint64, err error) {
 			l := 1 << (adds - 24)
 			tmpBuff = buff[:l]
 
-			if rn, rerr := r.Read(tmpBuff); rerr != nil {
+			if rn, rerr := io.ReadFull(r, tmpBuff); rerr != nil {
 				err = rerr
 				return
 			} else if rn != l {
