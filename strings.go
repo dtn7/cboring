@@ -5,13 +5,10 @@ import (
 	"io"
 )
 
-func readString(len int, r io.Reader) (data []byte, err error) {
-	data = make([]byte, len)
-	if rn, rerr := io.ReadFull(r, data); err != nil {
-		err = rerr
-	} else if rn != len {
-		err = fmt.Errorf("readString: read length mismatches: %d != %d", rn, len)
-	}
+// ReadRawBytes reads the next l bytes from r into a new byte slice.
+func ReadRawBytes(l uint64, r io.Reader) (data []byte, err error) {
+	data = make([]byte, l)
+	_, err = io.ReadFull(r, data)
 	return
 }
 
@@ -23,7 +20,7 @@ func ReadByteString(r io.Reader) (data []byte, err error) {
 		return
 	}
 
-	return readString(int(n), r)
+	return ReadRawBytes(n, r)
 }
 
 // WriteByteString writes a byte string into the Writer.
@@ -49,7 +46,7 @@ func ReadTextString(r io.Reader) (data string, err error) {
 		return
 	}
 
-	if rdata, rerr := readString(int(n), r); rerr != nil {
+	if rdata, rerr := ReadRawBytes(n, r); rerr != nil {
 		err = rerr
 	} else {
 		data = string(rdata)

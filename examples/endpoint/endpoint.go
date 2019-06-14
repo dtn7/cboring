@@ -1,4 +1,4 @@
-package main
+package endpoint
 
 import (
 	"fmt"
@@ -12,12 +12,12 @@ const (
 	endpointURISchemeIPN uint64 = 2
 )
 
-type EndpointID struct {
+type endpointID struct {
 	SchemeName         uint64
 	SchemeSpecificPart interface{}
 }
 
-func newEndpointIDDTN(ssp string) EndpointID {
+func newEndpointIDDTN(ssp string) endpointID {
 	var sspRaw interface{}
 	if ssp == "none" {
 		sspRaw = uint64(0)
@@ -25,26 +25,26 @@ func newEndpointIDDTN(ssp string) EndpointID {
 		sspRaw = string(ssp)
 	}
 
-	return EndpointID{
+	return endpointID{
 		SchemeName:         endpointURISchemeDTN,
 		SchemeSpecificPart: sspRaw,
 	}
 }
 
-func newEndpointIDIPN(ssp string) EndpointID {
+func newEndpointIDIPN(ssp string) endpointID {
 	re := regexp.MustCompile(`^(\d+)\.(\d+)$`)
 	matches := re.FindStringSubmatch(ssp)
 
 	nodeNo, _ := strconv.ParseUint(matches[1], 10, 64)
 	serviceNo, _ := strconv.ParseUint(matches[2], 10, 64)
 
-	return EndpointID{
+	return endpointID{
 		SchemeName:         endpointURISchemeIPN,
 		SchemeSpecificPart: [2]uint64{nodeNo, serviceNo},
 	}
 }
 
-func NewEndpointID(eid string) EndpointID {
+func newEndpointID(eid string) endpointID {
 	re := regexp.MustCompile(`^([[:alnum:]]+):(.+)$`)
 	matches := re.FindStringSubmatch(eid)
 
@@ -57,11 +57,11 @@ func NewEndpointID(eid string) EndpointID {
 	case "ipn":
 		return newEndpointIDIPN(ssp)
 	default:
-		return EndpointID{}
+		return endpointID{}
 	}
 }
 
-func (eid EndpointID) String() string {
+func (eid endpointID) String() string {
 	var b strings.Builder
 
 	switch eid.SchemeName {
