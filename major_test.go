@@ -150,9 +150,9 @@ func TestReadExampleArray(t *testing.T) {
 	for c := uint64(1); ; c++ {
 		n, err := ReadUInt(buff)
 
-		if err != nil && err != flagBreakCode {
-			t.Fatal(flagBreakCode)
-		} else if err == flagBreakCode {
+		if err != nil && err != FlagBreakCode {
+			t.Fatal(FlagBreakCode)
+		} else if err == FlagBreakCode {
 			if c != 26 {
 				t.Fatalf("Break stop code appeared at %d, not at %d", c, 26)
 			}

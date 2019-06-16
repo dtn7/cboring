@@ -20,15 +20,15 @@ const (
 	BreakCode       byte = 0xFF
 )
 
-type flag byte
+type Flag byte
 
-func (f flag) Error() string {
+func (f Flag) Error() string {
 	return string(f)
 }
 
 const (
-	flagIndefiniteArray = flag(iota)
-	flagBreakCode       = flag(iota)
+	FlagIndefiniteArray = Flag(iota)
+	FlagBreakCode       = Flag(iota)
 )
 
 func readMajorType(b byte) (major MajorType, adds byte) {
@@ -49,10 +49,10 @@ func ReadMajors(r io.Reader) (m MajorType, n uint64, err error) {
 
 	switch b := tmpBuff[0]; b {
 	case IndefiniteArray:
-		err = flagIndefiniteArray
+		err = FlagIndefiniteArray
 
 	case BreakCode:
-		err = flagBreakCode
+		err = FlagBreakCode
 
 	default:
 		var adds byte
