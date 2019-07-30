@@ -55,30 +55,19 @@ func BenchmarkPayload(b *testing.B) {
 		rand.Seed(0)
 		rand.Read(rndData)
 
-		b.Run(fmt.Sprintf("marshal-%d", size), func(b *testing.B) {
-			// Setup a buffer, like in the unmarshaling test
-			pbTmp := newPayloadBlock(rndData)
+		b.Run(fmt.Sprintf("%d", size), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				pbTmp := newPayloadBlock(rndData)
 
-			buff := new(bytes.Buffer)
-			if err := cboring.Marshal(&pbTmp, buff); err != nil {
-				b.Fatalf("Marshaling failed: %v", err)
-			}
+				buff := new(bytes.Buffer)
+				if err := cboring.Marshal(&pbTmp, buff); err != nil {
+					b.Fatalf("Marshaling failed: %v", err)
+				}
 
-			// Benchmark starts here
-			b.ResetTimer()
-
-			pb := payloadBlock{}
-			if err := cboring.Unmarshal(&pb, buff); err != nil {
-				b.Fatalf("Unmarshaling failed: %v", err)
-			}
-		})
-
-		b.Run(fmt.Sprintf("unmarshal-%d", size), func(b *testing.B) {
-			pb := newPayloadBlock(rndData)
-
-			buff := new(bytes.Buffer)
-			if err := cboring.Marshal(&pb, buff); err != nil {
-				b.Fatalf("Marshaling failed: %v", err)
+				pb := payloadBlock{}
+				if err := cboring.Unmarshal(&pb, buff); err != nil {
+					b.Fatalf("Unmarshaling failed: %v", err)
+				}
 			}
 		})
 	}

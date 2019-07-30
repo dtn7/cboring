@@ -53,20 +53,24 @@ func TestEndpoint(t *testing.T) {
 func BenchmarkEndpoint(b *testing.B) {
 	for _, test := range endpointTests {
 		b.Run(fmt.Sprintf("marshal-%s", test.eid), func(b *testing.B) {
-			e := newEndpointID(test.eid)
+			for i := 0; i < b.N; i++ {
+				e := newEndpointID(test.eid)
 
-			buff := new(bytes.Buffer)
-			if err := cboring.Marshal(&e, buff); err != nil {
-				b.Fatalf("Marshaling %s failed: %v", test.eid, err)
+				buff := new(bytes.Buffer)
+				if err := cboring.Marshal(&e, buff); err != nil {
+					b.Fatalf("Marshaling %s failed: %v", test.eid, err)
+				}
 			}
 		})
 
 		b.Run(fmt.Sprintf("unmarshal-%s", test.eid), func(b *testing.B) {
-			e := endpointID{}
+			for i := 0; i < b.N; i++ {
+				e := endpointID{}
 
-			buff := bytes.NewBuffer(test.cbor)
-			if err := cboring.Unmarshal(&e, buff); err != nil {
-				b.Fatalf("Unmarshaling %s failed: %v", test.eid, err)
+				buff := bytes.NewBuffer(test.cbor)
+				if err := cboring.Unmarshal(&e, buff); err != nil {
+					b.Fatalf("Unmarshaling %s failed: %v", test.eid, err)
+				}
 			}
 		})
 	}
