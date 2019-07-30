@@ -167,3 +167,36 @@ func TestArrayLen(t *testing.T) {
 		}
 	}
 }
+
+/*** Map ***/
+
+func TestMapPairLen(t *testing.T) {
+	tests := []struct {
+		data []byte
+		len  uint64
+	}{
+		{[]byte{0xA0}, 0},
+		{[]byte{0xA1}, 1},
+		{[]byte{0xB8, 0x19}, 25},
+	}
+
+	for _, test := range tests {
+		// Read
+		buff := bytes.NewBuffer(test.data)
+		if n, err := ReadMapPairLength(buff); err != nil {
+			t.Fatal(err)
+		} else if n != test.len {
+			t.Fatalf("Resulting length %d is not %d", n, test.len)
+		}
+
+		// Write
+		buff.Reset()
+		if err := WriteMapPairLength(test.len, buff); err != nil {
+			t.Fatal(err)
+		}
+
+		if bb := buff.Bytes(); !reflect.DeepEqual(bb, test.data) {
+			t.Fatalf("Serialized data mismatches: %x != %x", bb, test.data)
+		}
+	}
+}

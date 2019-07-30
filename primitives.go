@@ -55,3 +55,17 @@ func ReadArrayLength(r io.Reader) (n uint64, err error) {
 func WriteArrayLength(n uint64, w io.Writer) error {
 	return WriteMajors(Array, n, w)
 }
+
+/*** Map ***/
+
+// ReadMapPairLength expects a map at the Reader's position and returns the
+// amount of pairs stored.
+func ReadMapPairLength(r io.Reader) (n uint64, err error) {
+	return ReadExpectMajors(Map, r)
+}
+
+// WriteMapPairLength writes the type definition for a map with the given
+// amount of pairs into the Writer.
+func WriteMapPairLength(n uint64, w io.Writer) error {
+	return WriteMajors(Map, n, w)
+}

@@ -13,6 +13,7 @@ const (
 	ByteString MajorType = 0x40
 	TextString MajorType = 0x60
 	Array      MajorType = 0x80
+	Map        MajorType = 0xA0
 	SimpleData MajorType = 0xE0
 )
 

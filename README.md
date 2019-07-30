@@ -6,12 +6,13 @@ developed to be used in [`dtn7-go`][dtn7-go], an implementation of the
 `cboring` is both boring to use and bored about the amount of data to handle.
 
 
-## Non-Features
+## Features
 
-- Supports the subset of [CBOR's][cbor] features necessary for [BPv7][bpbis]:
+- Supports a selected subset of [CBOR's][cbor] features:
     - Unsigned Integer
     - Byte and Text String
     - Arrays, both of definite and indefinite length
+    - Maps of definite length
     - Booleans
 - Small and clear codebase:
     - Only works on streams, Go's `io.Reader` or `io.Writer`
