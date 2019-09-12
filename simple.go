@@ -3,6 +3,7 @@ package cboring
 import (
 	"fmt"
 	"io"
+	"math"
 )
 
 const (
@@ -50,4 +51,38 @@ func WriteBoolean(b bool, w io.Writer) (err error) {
 	_, err = w.Write([]byte{payload})
 
 	return
+}
+
+// ReadFloat32 reads a float32 value from the Reader.
+func ReadFloat32(r io.Reader) (f float32, err error) {
+	if fbits, fbitsErr := ReadExpectMajors(SimpleData, r); fbitsErr != nil {
+		err = fbitsErr
+	} else {
+		f = math.Float32frombits(uint32(fbits))
+	}
+
+	return
+}
+
+// WriteFloat32 writes a float32 into the Writer.
+func WriteFloat32(f float32, w io.Writer) (err error) {
+	fbits := math.Float32bits(f)
+	return WriteMajors(SimpleData, uint64(fbits), w)
+}
+
+// ReadFloat64 reads a float64 value from the Reader.
+func ReadFloat64(r io.Reader) (f float64, err error) {
+	if fbits, fbitsErr := ReadExpectMajors(SimpleData, r); fbitsErr != nil {
+		err = fbitsErr
+	} else {
+		f = math.Float64frombits(fbits)
+	}
+
+	return
+}
+
+// WriteFloat64 writes a float64 into the Writer.
+func WriteFloat64(f float64, w io.Writer) (err error) {
+	fbits := math.Float64bits(f)
+	return WriteMajors(SimpleData, fbits, w)
 }

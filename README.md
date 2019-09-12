@@ -10,6 +10,7 @@ developed to be used in [`dtn7-go`][dtn7-go], an implementation of the
 
 - Supports a selected subset of [CBOR's][cbor] features:
     - Unsigned Integer
+    - Floating-point values
     - Byte and Text String
     - Arrays, both of definite and indefinite length
     - Maps of definite length
@@ -20,6 +21,6 @@ developed to be used in [`dtn7-go`][dtn7-go], an implementation of the
 - Surprisingly fast
 
 
-[bpbis]: https://tools.ietf.org/html/draft-ietf-dtn-bpbis-13
+[bpbis]: https://tools.ietf.org/html/draft-ietf-dtn-bpbis-14
 [cbor]: https://tools.ietf.org/html/rfc7049
 [dtn7-go]: https://github.com/dtn7/dtn7-go
