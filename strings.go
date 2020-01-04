@@ -1,14 +1,32 @@
 package cboring
 
 import (
+	"bytes"
 	"fmt"
 	"io"
+	"math"
 )
 
 // ReadRawBytes reads the next l bytes from r into a new byte slice.
 func ReadRawBytes(l uint64, r io.Reader) (data []byte, err error) {
-	data = make([]byte, l)
-	_, err = io.ReadFull(r, data)
+	if l > math.MaxInt32 {
+		err = fmt.Errorf("cannot read %d raw bytes, is greater than max int32", l)
+		return
+	}
+
+	// The following code is a compromise. Data up to one megabyte is cached in memory. However, larger data will be
+	// copied in a temporary buffer, which is finally accessed. This is primarily a mitigation against resource
+	// exhaustion attacks with constructed CBOR strings which indicate to contain a huge payload.
+	if l <= 1024*1024 {
+		data = make([]byte, l)
+		_, err = io.ReadFull(r, data)
+	} else {
+		var buf bytes.Buffer
+		if _, err = io.CopyN(&buf, r, int64(l)); err == nil {
+			data = buf.Bytes()
+		}
+	}
+
 	return
 }
 
