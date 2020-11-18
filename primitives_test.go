@@ -50,13 +50,13 @@ func TestUInt(t *testing.T) {
 func TestReadUIntError(t *testing.T) {
 	tests := [][]byte{
 		// Wrong major type
-		[]byte{0xFF},
+		{0xFF},
 		// Wrong additionals for major type 0
-		[]byte{0x1F},
+		{0x1F},
 		// Empty stream
-		[]byte{},
+		{},
 		// Incomplete streams
-		[]byte{0x18}, []byte{0x1b, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+		{0x18}, {0x1b, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 	}
 
 	for _, test := range tests {
