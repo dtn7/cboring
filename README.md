@@ -1,4 +1,4 @@
-# cboring [![Build Status](https://travis-ci.org/dtn7/cboring.svg?branch=master)](https://travis-ci.org/dtn7/cboring) [![GoDoc](https://godoc.org/github.com/dtn7/cboring?status.svg)](https://godoc.org/github.com/dtn7/cboring)
+# cboring [![CI](https://github.com/dtn7/cboring/workflows/CI/badge.svg)](https://github.com/dtn7/cboring/actions) [![GoDoc](https://godoc.org/github.com/dtn7/cboring?status.svg)](https://godoc.org/github.com/dtn7/cboring)
 
 A simple [CBOR][cbor] Go(lang) library for a selected subset of features,
 developed to be used in [`dtn7-go`][dtn7-go], an implementation of the
