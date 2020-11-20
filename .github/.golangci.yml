@@ -1,0 +1,17 @@
+issues:
+  exclude-rules:
+    # Some deterministic "pseudo random" data is needed in tests
+    - path: _test\.go
+      text: "G404:"
+      linters:
+        - gosec
+
+linters:
+  # In addition to the default
+  enable:
+    - gocyclo
+    - gofmt
+    - goimports
+    - gosec
+    - prealloc
+    - unconvert

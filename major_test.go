@@ -52,9 +52,9 @@ func TestReadMajorsBig(t *testing.T) {
 func TestReadMajorsError(t *testing.T) {
 	tests := [][]byte{
 		// Empty stream
-		[]byte{},
+		{},
 		// Incomplete streams
-		[]byte{0x18}, []byte{0x19, 0x03},
+		{0x18}, {0x19, 0x03},
 	}
 
 	for _, test := range tests {
