@@ -1,0 +1,9 @@
+linters:
+  # In addition to the default
+  enable:
+    - gocyclo
+    - gofmt
+    - goimports
+    - gosec
+    - prealloc
+    - unconvert
