@@ -3,9 +3,10 @@ package cboring
 import (
 	"bytes"
 	"fmt"
-	"math/rand"
 	"reflect"
 	"testing"
+
+	"pgregory.net/rapid"
 )
 
 func TestByteString(t *testing.T) {
@@ -44,20 +45,15 @@ func TestByteString(t *testing.T) {
 	}
 }
 
-func BenchmarkByteString(b *testing.B) {
-	sizes := []int{
-		// Ridiculously small
-		0, 1, 128, 256,
-		// Kibibytes
-		1024, 10240, 102400,
-		// Mebibytes
-		1048576, 10485760, 104857600,
-	}
+const (
+	stringsMinSize = 0
+	stringMaxSize  = 104857600
+)
 
-	for _, size := range sizes {
-		rndData := make([]byte, size)
-		rand.Seed(0)
-		rand.Read(rndData)
+func BenchmarkByteString(b *testing.B) {
+	rapid.Check(b, func(t *rapid.T) {
+		rndData := rapid.SliceOfN(rapid.Byte(), stringsMinSize, stringMaxSize).Draw(t, "rndData")
+		size := len(rndData)
 
 		b.Run(fmt.Sprintf("%d", size), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
@@ -87,7 +83,7 @@ func BenchmarkByteString(b *testing.B) {
 				}
 			}
 		})
-	}
+	})
 }
 
 func TestReadTextString(t *testing.T) {

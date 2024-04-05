@@ -3,9 +3,10 @@ package cboring
 import (
 	"bufio"
 	"bytes"
-	"math/rand"
 	"reflect"
 	"testing"
+
+	"pgregory.net/rapid"
 )
 
 func TestReadMajorsSmall(t *testing.T) {
@@ -166,14 +167,17 @@ func TestReadExampleArray(t *testing.T) {
 	}
 }
 
-func TestReadBigData(t *testing.T) {
-	var size = 1024
-	var payload = make([]byte, size)
-	rand.Seed(0)
-	rand.Read(payload)
+const (
+	dataMinSize  = 0
+	dataMaxSize  = 1024
+	dataMinElems = 0
+	dataMaxElems = 50000
+)
 
-	var elems = []int{100, 500, 1000, 5000, 10000, 50000}
-	for _, elem := range elems {
+func TestReadBigData(t *testing.T) {
+	rapid.Check(t, func(t *rapid.T) {
+		payload := rapid.SliceOfN(rapid.Byte(), dataMinSize, dataMaxSize).Draw(t, "Payload")
+		elem := rapid.IntRange(dataMinElems, dataMaxElems).Draw(t, "Elements")
 		buff := new(bytes.Buffer)
 		bw := bufio.NewWriter(buff)
 
@@ -192,9 +196,14 @@ func TestReadBigData(t *testing.T) {
 			tmp, err := ReadByteString(br)
 			if err != nil {
 				t.Fatalf("Reading no %d errored: %v", i, err)
-			} else if len(tmp) != size {
-				t.Fatalf("Length no %d mismatches: %d != %d", i, len(tmp), size)
+			} else if len(tmp) != len(payload) {
+				t.Fatalf("Length no %d mismatches: %d != %d", i, len(tmp), len(payload))
+			}
+			for j := 0; j < len(tmp); j++ {
+				if tmp[j] != payload[j] {
+					t.Fatalf("Wrong value at %d: %d != %d", i, j, len(tmp))
+				}
 			}
 		}
-	}
+	})
 }
