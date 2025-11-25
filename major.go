@@ -20,6 +20,7 @@ const (
 
 const (
 	IndefiniteArray byte = 0x9F
+	Null            byte = SimpleData | simpleNull
 	BreakCode       byte = 0xFF
 )
 
@@ -32,6 +33,7 @@ func (f Flag) Error() string {
 const (
 	FlagIndefiniteArray = Flag(iota)
 	FlagBreakCode       = Flag(iota)
+	FlagNull            = Flag(iota)
 )
 
 func readMajorType(b byte) (major MajorType, adds byte) {
@@ -56,6 +58,9 @@ func ReadMajors(r io.Reader) (m MajorType, n uint64, err error) {
 
 	case BreakCode:
 		err = FlagBreakCode
+
+	case Null:
+		err = FlagNull
 
 	default:
 		var adds byte

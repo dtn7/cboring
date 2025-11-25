@@ -9,6 +9,7 @@ import (
 const (
 	simpleFalse byte = 20
 	simpleTrue  byte = 21
+	simpleNull  byte = 22
 )
 
 // ReadBoolean reads a bool value from the Reader.
@@ -31,6 +32,8 @@ func ReadBoolean(r io.Reader) (b bool, err error) {
 		b = false
 	case simpleTrue:
 		b = true
+	case simpleNull:
+		err = FlagNull
 	default:
 		err = fmt.Errorf("ReadBoolean: Unknown additional 0x%x", adds)
 	}
@@ -85,4 +88,9 @@ func ReadFloat64(r io.Reader) (f float64, err error) {
 func WriteFloat64(f float64, w io.Writer) (err error) {
 	fbits := math.Float64bits(f)
 	return WriteMajors(SimpleData, fbits, w)
+}
+
+// WriteNull writes a null into the Writer.
+func WriteNull(w io.Writer) (err error) {
+	return WriteMajors(SimpleData, uint64(simpleNull), w)
 }
