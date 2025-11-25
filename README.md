@@ -15,6 +15,7 @@ developed to be used in [`dtn7-go`][dtn7-go], an implementation of the
     - Arrays, both of definite and indefinite length
     - Maps of definite length
     - Booleans
+    - Null
 - Small and clear codebase:
     - Only works on streams, Go's `io.Reader` or `io.Writer`
     - Does *not* use reflection or make any strange assumptions

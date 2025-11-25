@@ -3,6 +3,7 @@ package cboring
 import (
 	"bufio"
 	"bytes"
+	"io"
 	"reflect"
 	"testing"
 
@@ -206,4 +207,44 @@ func TestReadBigData(t *testing.T) {
 			}
 		}
 	})
+}
+
+func asUntyped[T any](read func(reader io.Reader) (T, error)) func(reader io.Reader) (any, error) {
+	return func(reader io.Reader) (any, error) {
+		return read(reader)
+	}
+}
+
+func TestNull(t *testing.T) {
+	tests := []struct {
+		data  []byte
+		value any
+		read  func(reader io.Reader) (any, error)
+	}{
+		{[]byte{Null, 0xfb, 0xc0, 0x10, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66}, -4.1, asUntyped(ReadFloat64)},
+		{[]byte{Null, 0x64, 0x74, 0x65, 0x73, 0x74}, "test", asUntyped(ReadTextString)},
+		{[]byte{Null, SimpleData | simpleTrue}, true, asUntyped(ReadBoolean)},
+		{[]byte{Null, 0x0a}, uint64(10), asUntyped(ReadUInt)},
+	}
+
+	for _, test := range tests {
+		// Read
+		buff := bytes.NewBuffer(test.data)
+		if v, err := test.read(buff); err != FlagNull {
+			t.Fatalf("found Value %s", v)
+		}
+		if v, err := test.read(buff); err != nil {
+			t.Fatal(err)
+		} else if v != test.value {
+			t.Fatalf("Resulting value %s not expected %s", v, test.value)
+		}
+	}
+
+	buff := &bytes.Buffer{}
+	err := WriteNull(buff)
+	if err != nil {
+		t.Fatal(err)
+	} else if buff.Len() != 1 || buff.Bytes()[0] != Null {
+		t.Fatal("written value not null")
+	}
 }
