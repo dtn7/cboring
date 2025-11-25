@@ -10,6 +10,7 @@ developed to be used in [`dtn7-go`][dtn7-go], an implementation of the
 
 - Supports a selected subset of [CBOR's][cbor] features:
     - Unsigned Integer
+    - Negative Integer
     - Floating-point values
     - Byte and Text String
     - Arrays, both of definite and indefinite length
