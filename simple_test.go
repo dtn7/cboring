@@ -17,7 +17,8 @@ func TestBoolean(t *testing.T) {
 
 	for _, test := range tests {
 		// Read
-		buff := bytes.NewBuffer(test.data)
+		buff := &bytes.Buffer{}
+		_, _ = buff.Write(test.data)
 		if b, err := ReadBoolean(buff); err != nil {
 			t.Fatal(err)
 		} else if b != test.b {
@@ -47,7 +48,8 @@ func TestFloat32(t *testing.T) {
 
 	for _, test := range tests {
 		// Read
-		buff := bytes.NewBuffer(test.data)
+		buff := &bytes.Buffer{}
+		_, _ = buff.Write(test.data)
 		if f, err := ReadFloat32(buff); err != nil {
 			t.Fatal(err)
 		} else if f != test.f {
@@ -78,7 +80,8 @@ func TestFloat64(t *testing.T) {
 
 	for _, test := range tests {
 		// Read
-		buff := bytes.NewBuffer(test.data)
+		buff := &bytes.Buffer{}
+		_, _ = buff.Write(test.data)
 		if f, err := ReadFloat64(buff); err != nil {
 			t.Fatal(err)
 		} else if f != test.f {

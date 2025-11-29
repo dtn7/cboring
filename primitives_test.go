@@ -28,7 +28,8 @@ func TestUInt(t *testing.T) {
 
 	for _, test := range tests {
 		// Read
-		buff := bytes.NewBuffer(test.data)
+		buff := &bytes.Buffer{}
+		_, _ = buff.Write(test.data)
 		if n, err := ReadUInt(buff); err != nil {
 			t.Fatal(err)
 		} else if n != test.numb {
@@ -82,7 +83,8 @@ func TestByteStringLen(t *testing.T) {
 
 	for _, test := range tests {
 		// Read
-		buff := bytes.NewBuffer(test.data)
+		buff := &bytes.Buffer{}
+		_, _ = buff.Write(test.data)
 		if n, err := ReadByteStringLen(buff); err != nil {
 			t.Fatal(err)
 		} else if n != test.len {
@@ -116,7 +118,8 @@ func TestTextStringLen(t *testing.T) {
 
 	for _, test := range tests {
 		// Read
-		buff := bytes.NewBuffer(test.data)
+		buff := &bytes.Buffer{}
+		_, _ = buff.Write(test.data)
 		if n, err := ReadTextStringLen(buff); err != nil {
 			t.Fatal(err)
 		} else if n != test.len {
@@ -149,7 +152,8 @@ func TestArrayLen(t *testing.T) {
 
 	for _, test := range tests {
 		// Read
-		buff := bytes.NewBuffer(test.data)
+		buff := &bytes.Buffer{}
+		_, _ = buff.Write(test.data)
 		if n, err := ReadArrayLength(buff); err != nil {
 			t.Fatal(err)
 		} else if n != test.len {
@@ -182,7 +186,8 @@ func TestMapPairLen(t *testing.T) {
 
 	for _, test := range tests {
 		// Read
-		buff := bytes.NewBuffer(test.data)
+		buff := &bytes.Buffer{}
+		_, _ = buff.Write(test.data)
 		if n, err := ReadMapPairLength(buff); err != nil {
 			t.Fatal(err)
 		} else if n != test.len {

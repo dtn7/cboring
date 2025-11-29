@@ -26,7 +26,8 @@ func TestByteString(t *testing.T) {
 
 	for _, test := range tests {
 		// Read
-		buff := bytes.NewBuffer(test.cbor)
+		buff := &bytes.Buffer{}
+		_, _ = buff.Write(test.cbor)
 		if data, err := ReadByteString(buff); err != nil {
 			t.Fatal(err)
 		} else if !reflect.DeepEqual(data, test.data) {
@@ -122,7 +123,8 @@ func TestReadTextString(t *testing.T) {
 
 	for _, test := range tests {
 		// Read
-		buff := bytes.NewBuffer(test.cbor)
+		buff := &bytes.Buffer{}
+		_, _ = buff.Write(test.cbor)
 		if data, err := ReadTextString(buff); err != nil {
 			t.Fatal(err)
 		} else if data != test.data {
